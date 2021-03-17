@@ -1,5 +1,4 @@
-# psh
-PHP Shell.
+# psh - a PHP Shell.
 
 Tired of switching tooling versions between PHP projects? Perhaps you've used a Python virtual environment before? This is an approximation of the same idea for PHP projects. It doesn't deal with installing packages though.
 
