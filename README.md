@@ -16,7 +16,9 @@ Supports
 
 ## Install
 
-1. Symlink `psh.sh` to `psh` in your path.
+Note that you need to have the tooling pre-installed.
+
+1. Symlink `psh.sh` to `psh` in your path. eg `ln -s $HOME/dev/shell/psh/psh.sh ~/bin/psh`
 2. Add a `pshrc` file to your project folder ala:
 
 ```
@@ -24,3 +26,5 @@ php=7.3
 composer=1.10
 node=15.
 ```
+
+3. type `psh` to start a subshell with tooling set to those versions.
