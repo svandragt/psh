@@ -86,14 +86,11 @@ function node_switch {
 	alias >> ~/setAppEnv
 }
 
+function php_switch {
+	# target version
+	local TARGET=$1
 
-
-
-
-
-
-
-function php_detect {
+	# Convert versions to installation paths
 	local VERSIONS=""
 	# add ~/.phps if it exists (default)
 	if [[ -d $HOME/.phps ]]; then
@@ -110,13 +107,6 @@ function php_detect {
 		REPOS=("${REPOS[@]}" $_VERSION)
 	done
 	VERSIONS=
-
-	echo $REPOS
-}
-
-function php_locate {
-	local REPOS=$1
-	local TARGET=$2
 
 	# locate selected PHP version
 	for _REPO in "${REPOS[@]}"; do
@@ -151,20 +141,9 @@ function php_locate {
 
 	# bail-out if we were unable to find a PHP matching given version
 	if [[ -z $_ROOT ]]; then
-		echo "Sorry, unable to find version '$1'." >&2
+		echo "Sorry, unable to find version '$TARGET'." >&2
 		return 1
 	fi
-
-	echo $_ROOT
-}
-
-function php_switch {
-	# target version
-	local TARGET=$1
-
-	# Convert versions to installation paths
-	local REPOS=$(php_detect)
-	local _ROOT=$(php_locate $REPOS $TARGET)
 
 	echo "Using PHP $_ROOT"
 
