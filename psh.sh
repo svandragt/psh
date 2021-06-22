@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+    
 function composer_detect {
 	local VERSIONS=$(ls $HOME/.composer/*.phar)
 	echo $VERSIONS
