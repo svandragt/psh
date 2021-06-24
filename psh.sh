@@ -266,14 +266,14 @@ function _main {
 	source pshrc
 
 	# PHP before composer
-	if [ -n "$php" ]; then
+	if [ -n "${php-}" ]; then
 		php_alias "$php"
 	fi
-	if [ -n "$composer" ]; then
+	if [ -n "${composer-}" ]; then
 		composer_alias "$composer"
 	fi
 
-	if [ -n "$node" ]
+	if [ -n "${node-}" ]
 	then
 		node_alias "$node"
 	fi
