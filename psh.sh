@@ -24,7 +24,6 @@ function composer_all {
 
 function composer_select {
 	local input
-  ed
 	local all
 	input=$1
 	selected=''
