@@ -4,66 +4,66 @@ IFS=$'\n\t'
 
 ### COMPOSER ###
 function composer_alias {
-  # input version
-  local selected
-  selected=$(composer_select "$1")
+	# input version
+	local selected
+	selected=$(composer_select "$1")
 
-  echo "Using Composer: $selected"
-  # refresh shell
-  hash -r
-  # shellcheck disable=SC2139
-  alias composer="php $selected"
-  alias >>~/setAppEnv
+	echo "Using Composer: $selected"
+	# refresh shell
+	hash -r
+	# shellcheck disable=SC2139
+	alias composer="php $selected"
+	alias >>~/setAppEnv
 }
 
 function composer_all {
-  local all
-  all=$(find ~/.composer -maxdepth 1 -name '*.phar' | sort --field-separator=- --key=6Vr)
-  echo "$all"
+	local all
+	all=$(find ~/.composer -maxdepth 1 -name '*.phar' | sort --field-separator=- --key=6Vr)
+	echo "$all"
 }
 
 function composer_select {
-  local all
-  local input
-  input=$1
-  all=$(composer_all)
+	local all
+	local input
+	input=$1
+	all=$(composer_all)
 
-  # filter selected Composer version
-  local selected
-  for v in $(echo "$all" | tr " " "\n"); do
-    if [[ $v == *"-$input"* ]]; then
-      selected=$v
-      break
-    fi
-  done
+	# filter selected Composer version
+	local selected
+	for v in $(echo "$all" | tr " " "\n"); do
+		if [[ $v == *"-$input"* ]]; then
+			selected=$v
+			break
+		fi
+	done
 
-  # bail-out if we were unable to find a PHP matching given version
-  if [[ -z $selected ]]; then
-    echo "Sorry, unable to find version '$input'." >&2
-    return 0
-  fi
-  echo "$selected"
+	# bail-out if we were unable to find a PHP matching given version
+	if [[ -z $selected ]]; then
+		echo "Sorry, unable to find version '$input'." >&2
+		return 0
+	fi
+	echo "$selected"
 }
 ### /COMPOSER ###
 
 ### NODE ###
 function node_alias {
-  # input version
-  local selected
-  selected=$(node_select "$1")
+	# input version
+	local selected
+	selected=$(node_select "$1")
 
-  echo "Using Node: $selected"
-  # refresh shell
-  hash -r
-  # shellcheck disable=SC2139
-  alias node="$selected"
-  alias >>~/setAppEnv
+	echo "Using Node: $selected"
+	# refresh shell
+	hash -r
+	# shellcheck disable=SC2139
+	alias node="$selected"
+	alias >>~/setAppEnv
 }
 
 function node_all_nvm {
-  all=$1
+	all=$1
 
-  if [[ -n $NVM_DIR ]]; then
+	if [[ -n $NVM_DIR ]]; then
 		all="$all $(find "$NVM_DIR/all/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
 	fi
 
@@ -73,18 +73,18 @@ function node_all_nvm {
 	done
 	all=
 
-  echo "${repos[@]}"
+	echo "${repos[@]}"
 }
 
 function node_all_volta {
-  all=$1
+	all=$1
 
-  # add default Homebrew directories (php@x.y) if brew is installed
+	# add default Homebrew directories (php@x.y) if brew is installed
 	if [[ -n $(command -v volta) ]]; then
 		all="$all  $(find ~/.volta/tools/image/node -mindepth 1 -maxdepth 1 -type d)"
 	fi
 
-  echo "${all[@]}"
+	echo "${all[@]}"
 }
 
 # Must be after node_all_*
@@ -96,7 +96,7 @@ function node_all {
 	all=$(node_all_nvm "$all")
 	all=$(node_all_volta "$all")
 
-  echo "$all"
+	echo "$all"
 }
 
 function node_select {
@@ -111,13 +111,13 @@ function node_select {
 	local input
 	input=$1
 
-  # locate selected node version
-  for v in $(echo "$all" | tr " " "\n"); do
-    if [[ $v == *"/$input"* || $v == *"/v$input"*  ]]; then
-      selected="$v/bin/node"
-      break
-    fi
-  done
+	# locate selected node version
+	for v in $(echo "$all" | tr " " "\n"); do
+		if [[ $v == *"/$input"* || $v == *"/v$input"*  ]]; then
+			selected="$v/bin/node"
+			break
+		fi
+	done
 
 
 	# bail-out if we were unable to find a PHP matching given version
@@ -126,51 +126,51 @@ function node_select {
 		return 0
 	fi
 
-  echo "$selected"
+	echo "$selected"
 }
 ### /NODE ###
 
 ### PHP ###
 function php_alias {
-  local selected
-  selected=$(php_select "$1")
+	local selected
+	selected=$(php_select "$1")
 
-  echo "Using PHP     : $selected"
-  # refresh shell
-  hash -r
-  alias >>~/setAppEnv
+	echo "Using PHP     : $selected"
+	# refresh shell
+	hash -r
+	alias >>~/setAppEnv
 }
 
 function php_all {
-  local all
-  all=''
+	local all
+	all=''
 
-  # add ~/.phps if it exists (default)
+	# add ~/.phps if it exists (default)
 	if [[ -d $HOME/.phps ]]; then
 		all="$all $HOME/.phps"
 	fi
 
-  # add default Homebrew directories (php@x.y) if brew is installed
+	# add default Homebrew directories (php@x.y) if brew is installed
 	if [[ -n $(command -v brew) ]]; then
 		all="$all  $(find "$(brew --cellar)" -maxdepth 1 -type d | grep -E 'php@[0-9\.]*$')"
 	fi
-  echo "$all"
+	echo "$all"
 }
 
 function php_select {
-  local all
-  local input
-  input=$1
-  all=$(php_all)
+	local all
+	local input
+	input=$1
+	all=$(php_all)
 
-  #TODO are we restructuring the array here?
-  repos=()
+	#TODO are we restructuring the array here?
+	repos=()
 	for v in $(echo "$all" | tr " " "\n"); do
 		repos=("${repos[@]}" "$v")
 	done
 	all=
 
-  local selected
+	local selected
 	selected=$(php_select_exact "${repos[@]}")
 	if [[ -z $selected ]]; then
 		selected=$(php_select_fuzzy "${repos[@]}")
@@ -195,20 +195,20 @@ function php_select {
 	[[ -z $_manpath ]] && _manpath=$selected/share/man
 	[[ -d $_manpath ]] && export MANPATH="$_manpath:${MANPATH-}"
 
-  echo "$selected"
+	echo "$selected"
 
 	hash -r
 	export > ~/setAppEnv
 }
 
 function php_select_exact() {
-  local selected
-  local -a repos
-  selected=''
-  repos=$1
+	local selected
+	local -a repos
+	selected=''
+	repos=$1
 
-  for r in "${repos[@]}"; do
-	  option="$r/$input"
+	for r in "${repos[@]}"; do
+		option="$r/$input"
 		if [[ -d "$option" ]]; then
 			selected="$option"
 			break;
@@ -219,66 +219,66 @@ function php_select_exact() {
 }
 
 function php_select_fuzzy() {
-  local selected
-  local -a repos
-  local -a input_fuzzy
-  selected=''
-  repos=$1
+	local selected
+	local -a repos
+	local -a input_fuzzy
+	selected=''
+	repos=$1
 
-  # TODO what does this do
-  for r in "${repos[@]}"; do
-    while IFS= read -r -d '' _dir; do
-      input_fuzzy=("${input_fuzzy[@]}" "$("$_dir/bin/php-config" --version 2>/dev/null)")
-    done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
-  done
+	# TODO what does this do
+	for r in "${repos[@]}"; do
+		while IFS= read -r -d '' _dir; do
+			input_fuzzy=("${input_fuzzy[@]}" "$("$_dir/bin/php-config" --version 2>/dev/null)")
+		done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
+	done
 
-  # Sort versioning
-  version=$(IFS=$'\n'; echo "${input_fuzzy[*]}" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | grep -E "^$input" 2>/dev/null | tail -1)
+	# Sort versioning
+	version=$(IFS=$'\n'; echo "${input_fuzzy[*]}" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | grep -E "^$input" 2>/dev/null | tail -1)
 
-  # Match exact version
-  for r in "${repos[@]}"; do
-    while IFS= read -r -d '' _dir; do
-      v="$("$_dir/bin/php-config" --version 2>/dev/null)"
-      if [[ -n "$version" && "$v" == "$version" ]]; then
-        selected=$_dir
-        break;
-      fi
-    done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
-  done
+	# Match exact version
+	for r in "${repos[@]}"; do
+		while IFS= read -r -d '' _dir; do
+			v="$("$_dir/bin/php-config" --version 2>/dev/null)"
+			if [[ -n "$version" && "$v" == "$version" ]]; then
+				selected=$_dir
+				break;
+			fi
+		done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
+	done
 
-  echo "$selected"
+	echo "$selected"
 }
 ### PHP ###
 
 function _ensure_rcfile {
-  file=pshrc
-  if [ ! -f $file ]; then
-    echo "Creating $file file..."
-    touch $file
-    $EDITOR $file
-    exit 0
-  fi
+	file=pshrc
+	if [ ! -f $file ]; then
+		echo "Creating $file file..."
+		touch $file
+		$EDITOR $file
+		exit 0
+	fi
 }
 
 # MAIN
 function _main {
-  _ensure_rcfile
-  source pshrc
+	_ensure_rcfile
+	source pshrc
 
-  # PHP before composer
-  if [ -n "$php" ]; then
-    php_alias "$php"
-  fi
-  if [ -n "$composer" ]; then
-    composer_alias "$composer"
-  fi
+	# PHP before composer
+	if [ -n "$php" ]; then
+		php_alias "$php"
+	fi
+	if [ -n "$composer" ]; then
+		composer_alias "$composer"
+	fi
 
-  if [ -n "$node" ]
-  then
-  	node_alias "$node"
-  fi
+	if [ -n "$node" ]
+	then
+		node_alias "$node"
+	fi
 
-  bash --rcfile ~/setAppEnv
-  rm -rf ~/setAppEnv
+	bash --rcfile ~/setAppEnv
+	rm -rf ~/setAppEnv
 }
 _main
