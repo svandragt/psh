@@ -47,6 +47,7 @@ function node_alias {
   echo "Using Node: $selected"
   # refresh shell
   hash -r
+  # shellcheck disable=SC2139
   alias node="$selected"
   alias >>~/setAppEnv
 }
