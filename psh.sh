@@ -38,63 +38,108 @@ function composer_switch() {
   target=$1
   _phar=$(composer_select "$target")
 
-  echo "Using composer $_phar"
+### NODE ###
+function node_alias {
+  # input version
+  local selected
+  selected=$(node_select "$1")
 
+  echo "Using Node: $selected"
+  # refresh shell
   hash -r
-  alias composer="php \$_phar"
+  alias node="$selected"
   alias >>~/setAppEnv
 }
 
-#function node_locate {
-#	local all
-#	all=""
-#
-#	# add default nvm directories if brew is installed
-#	if [[ -n $NVM_DIR ]]; then
-#		all="$all $(find "$NVM_DIR/all/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
-#	fi
-#
-#	repos=()
-#	for _version in $(echo "$all" | tr " " "\n"); do
-#		repos=("${repos[@]}" "$_version")
-#	done
-#	all=
-#
-#	local target
-#	target=$1
-#
-#	# locate selected PHP version
-#	for _repo in "${repos[@]}"; do
-#		if [[ $_repo == *"/v$target"*  && -z $_root ]]; then
-#			local _root=$_repo/bin/node
-#			break;
-#		fi
-#	done
-#
-#	# bail-out if we were unable to find a PHP matching given version
-#	if [[ -z $_root ]]; then
-#		echo "Sorry, unable to find version '$1'." >&2
-#		return 1
-#	fi
-#
-#	echo "$_root"
-#}
+function node_all_nvm {
+  all=$1
 
-#function node_switch {
-#	# target version
-#	local target
-#	local _root
-#
-#	target=$1
-#	# Convert all to installation paths
-#	_root=$(node_locate "$target")
-#
-#	echo "Using node $_root"
-#
-#	hash -r
-#	alias node="\$_root"
-#	alias >> ~/setAppEnv
-#}
+  if [[ -n $NVM_DIR ]]; then
+		all="$all $(find "$NVM_DIR/all/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
+	fi
+
+	repos=()
+	for v in $(echo "$all" | tr " " "\n"); do
+		repos=("${repos[@]}" "$v")
+	done
+	all=
+
+  echo "${repos[@]}"
+}
+
+function node_all_volta {
+  all=$1
+
+  # add default Homebrew directories (php@x.y) if brew is installed
+	if [[ -n $(command -v volta) ]]; then
+		all="$all  $(find ~/.volta/tools/image/node -mindepth 1 -maxdepth 1 -type d)"
+	fi
+
+  echo "${all[@]}"
+}
+
+# Must be after node_all_*
+function node_all {
+	local all
+	local selected
+	all=""
+
+	all=$(node_all_nvm "$all")
+	all=$(node_all_volta "$all")
+
+  echo "$all"
+}
+
+function node_select {
+	# input version
+	local input
+	local selected
+
+	input=$1
+	# Convert all to installation paths
+	all=$(node_all "$input")
+
+	local input
+	input=$1
+
+  # locate selected node version
+  for v in $(echo "$all" | tr " " "\n"); do
+    if [[ $v == *"/$input"* || $v == *"/v$input"*  ]]; then
+      selected="$v/bin/node"
+      break
+    fi
+  done
+
+
+	# bail-out if we were unable to find a PHP matching given version
+	if [[ -z $selected ]]; then
+		echo "Sorry, unable to find version '$1'." >&2
+		return 0
+	fi
+
+  echo "$selected"
+}
+### /NODE ###
+
+### PHP ###
+function php_alias {
+  local selected
+  selected=$(php_select "$1")
+
+  echo "Using PHP     : $selected"
+  # refresh shell
+  hash -r
+  alias >>~/setAppEnv
+}
+
+function php_all {
+  local all
+  all=''
+
+  # add ~/.phps if it exists (default)
+	if [[ -d $HOME/.phps ]]; then
+		all="$all $HOME/.phps"
+	fi
 
 #function php_switch {
 #	# target version
