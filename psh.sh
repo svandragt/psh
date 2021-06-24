@@ -23,13 +23,14 @@ function composer_all {
 }
 
 function composer_select {
-	local all
 	local input
+  ed
+	local all
 	input=$1
+	selected=''
 	all=$(composer_all)
 
 	# filter selected Composer version
-	local selected
 	for v in $(echo "$all" | tr " " "\n"); do
 		if [[ $v == *"-$input"* ]]; then
 			selected=$v
@@ -103,22 +104,18 @@ function node_select {
 	# input version
 	local input
 	local selected
-
 	input=$1
+	selected=''
+
 	# Convert all to installation paths
 	all=$(node_all "$input")
 
-	local input
-	input=$1
-
-	# locate selected node version
 	for v in $(echo "$all" | tr " " "\n"); do
 		if [[ $v == *"/$input"* || $v == *"/v$input"*  ]]; then
 			selected="$v/bin/node"
 			break
 		fi
 	done
-
 
 	# bail-out if we were unable to find a PHP matching given version
 	if [[ -z $selected ]]; then
@@ -158,8 +155,9 @@ function php_all {
 }
 
 function php_select {
-	local all
 	local input
+  local selected
+	local all
 	input=$1
 	all=$(php_all)
 
@@ -170,7 +168,6 @@ function php_select {
 	done
 	all=
 
-	local selected
 	selected=$(php_select_exact "${repos[@]}")
 	if [[ -z $selected ]]; then
 		selected=$(php_select_fuzzy "${repos[@]}")
