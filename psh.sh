@@ -76,7 +76,6 @@ function node_all_nvm {
 function node_all_volta {
     all=$1
 
-    # add default Homebrew directories (php@x.y) if brew is installed
     if [[ -n $(command -v volta) ]]; then
         all="$all  $(find ~/.volta/tools/image/node -mindepth 1 -maxdepth 1 -type d)"
     fi
