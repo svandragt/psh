@@ -35,9 +35,8 @@ function composer_select {
 		fi
 	done
 
-	# bail-out if we were unable to find a PHP matching given version
 	if [[ -z $selected ]]; then
-		echo "Sorry, unable to find version '$input'." >&2
+		echo "Sorry, unable to find Composer version '$input'." >&2
 		return 0
 	fi
 	echo "$selected"
@@ -114,9 +113,8 @@ function node_select {
 		fi
 	done
 
-	# bail-out if we were unable to find a PHP matching given version
 	if [[ -z $selected ]]; then
-		echo "Sorry, unable to find version '$1'." >&2
+		echo "Sorry, unable to find Node version '$1'." >&2
 		return 0
 	fi
 
@@ -170,9 +168,8 @@ function php_select {
 		selected=$(php_select_fuzzy "${repos[@]}")
 	fi
 
-	# bail-out if we were unable to find a PHP matching given version
 	if [[ -z $selected ]]; then
-		echo "Sorry, unable to find version '$input'." >&2
+		echo "Sorry, unable to find PHP version '$input'." >&2
 		return 0
 	fi
 
