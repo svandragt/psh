@@ -19,7 +19,7 @@ Supports
 
 Note that you need to have the tooling pre-installed.
 
-1. Symlink `psh.sh` to `psh` in your path. eg `ln -s $HOME/dev/shell/psh/psh.sh ~/bin/psh`
+1. Symlink `psh.sh` to `psh` in your path. eg `ln -s psh.sh ~/bin/psh`
 2. Add a `pshrc` file to your project folder ala:
 
 ```
@@ -29,3 +29,16 @@ node=15.
 ```
 
 3. type `psh` to start a subshell with tooling set to those versions. Type `exit` to exit the subshell.
+
+## Tip
+
+If you're using zsh you can use the following function to automatically enter the subshell:
+```
+function chpwd() {
+    if [ -r $PWD/pshrc ]; then
+        psh
+        return
+    fi
+}
+```
+
