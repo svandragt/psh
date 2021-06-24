@@ -49,7 +49,7 @@ function node_alias {
     local selected
     selected=$(node_select "$1")
 
-    echo "Using Node: $selected"
+    echo "Using Node    : $selected"
     # refresh shell
     hash -r
     # shellcheck disable=SC2139
@@ -246,7 +246,6 @@ function _ensure_rcfile {
     file=pshrc
     if [ ! -f $file ]; then
         echo "Creating $file file..."
-        touch $file
         $EDITOR $file
         exit 0
     fi
