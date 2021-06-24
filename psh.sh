@@ -195,6 +195,7 @@ function php_select {
 function php_select_exact() {
 	local selected
 	local -a repos
+	local option
 	selected=''
 	repos=$1
 
