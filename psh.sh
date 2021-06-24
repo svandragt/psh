@@ -17,9 +17,7 @@ function composer_alias {
 }
 
 function composer_all {
-	local all
-	all=$(find ~/.composer -maxdepth 1 -name '*.phar' | sort --field-separator=- --key=6Vr)
-	echo "$all"
+	find ~/.composer -maxdepth 1 -name '*.phar' | sort --field-separator=- --key=6Vr
 }
 
 function composer_select {
