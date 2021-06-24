@@ -2,22 +2,36 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-function composer_all() {
+### COMPOSER ###
+function composer_alias {
+  # input version
+  local selected
+  selected=$(composer_select "$1")
+
+  echo "Using Composer: $selected"
+  # refresh shell
+  hash -r
+  # shellcheck disable=SC2139
+  alias composer="php $selected"
+  alias >>~/setAppEnv
+}
+
+function composer_all {
   local all
   all=$(find ~/.composer -maxdepth 1 -name '*.phar' | sort --field-separator=- --key=6Vr)
   echo "$all"
 }
 
-function composer_select() {
+function composer_select {
   local all
-  local target
-  target=$1
+  local input
+  input=$1
   all=$(composer_all)
 
-  # locate selected PHP version
+  # filter selected Composer version
   local selected
   for v in $(echo "$all" | tr " " "\n"); do
-    if [[ $v == *"-$target"* ]]; then
+    if [[ $v == *"-$input"* ]]; then
       selected=$v
       break
     fi
@@ -25,18 +39,12 @@ function composer_select() {
 
   # bail-out if we were unable to find a PHP matching given version
   if [[ -z $selected ]]; then
-    echo "Sorry, unable to find version '$1'." >&2
-    return 1
+    echo "Sorry, unable to find version '$input'." >&2
+    return 0
   fi
   echo "$selected"
 }
-
-function composer_switch() {
-  # target version
-  local target
-  local _phar
-  target=$1
-  _phar=$(composer_select "$target")
+### /COMPOSER ###
 
 ### NODE ###
 function node_alias {
@@ -142,106 +150,135 @@ function php_all {
 		all="$all $HOME/.phps"
 	fi
 
-#function php_switch {
-#	# target version
-#	local target=$1
-#
-#	# Convert all to installation paths
-#	local all=""
-#	# add ~/.phps if it exists (default)
-#	if [[ -d $HOME/.phps ]]; then
-#		all="$all $HOME/.phps"
-#	fi
-#
-#	# add default Homebrew directories if brew is installed
-#	if [[ -n $(command -v brew) ]]; then
-#		all="$all  $(find "$(brew --cellar)" -maxdepth 1 -type d | grep -E 'php@[0-9\.]*$')"
-#	fi
-#
-#	repos=()
-#	for _version in $(echo "$all" | tr " " "\n"); do
-#		repos=("${repos[@]}" "$_version")
-#	done
-#	all=
-#
-#	# locate selected PHP version
-#	local _root
-#	for _repo in "${repos[@]}"; do
-#		if [[ -d "$_repo/$target" && -z $_root ]]; then
-#			_root="$_repo/$target"
-#			break;
-#		fi
-#	done
-#
-#	# try a fuzzy match since we were unable to find a PHP matching given version
-#	if [[ -z $_root ]]; then
-#		target_fuzzy=()
-#
-#		for _repo in "${repos[@]}"; do
-#			while IFS= read -r -d '' _dir; do
-#				target_fuzzy=("${target_fuzzy[@]}" "$("$_dir/bin/php-config" --version 2>/dev/null)")
-#			done< <(find -H "$_repo" -maxdepth 1 -mindepth 1 -type d 2 -print0)
-#		done
-#
-#		target_fuzzy=$(IFS=$'\n'; echo "${target_fuzzy[*]}" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | grep -E "^$target" 2>/dev/null | tail -1)
-#
-#		for _repo in "${repos[@]}"; do
-#			while IFS= read -r -d '' _dir; do
-#				_version="$("$_dir/bin/php-config" --version 2>/dev/null)"
-#				if [[ -n "$target_fuzzy" && "$_version" == "$target_fuzzy" ]]; then
-#					local _root=$_dir
-#					break;
-#				fi
-#			done< <(find -H "$_repo" -maxdepth 1 -mindepth 1 -type d 2 -print0)
-#		done
-#	fi
-#
-#	# bail-out if we were unable to find a PHP matching given version
-#	if [[ -z $_root ]]; then
-#		echo "Sorry, unable to find version '$target'." >&2
-#		return 1
-#	fi
-#
-#	echo "Using PHP $_root"
-#
-#	# export current paths
-#	export PHPRC=""
-#	[[ -f $_root/etc/php.ini ]] && export PHPRC=$_root/etc/php.ini
-#	[[ -d $_root/bin  ]]        && export PATH="$_root/bin:$PATH"
-#	[[ -d $_root/sbin ]]        && export PATH="$_root/sbin:$PATH"
-#
-#	# use configured manpath if it exists, otherwise, use `$_root/share/man`
-#	local _manpath
-#	_manpath=$(php-config --man-dir)
-#	[[ -z $_manpath ]] && _manpath=$_root/share/man
-#	[[ -d $_manpath ]] && export MANPATH="$_manpath:$MANPATH"
-#
-#	hash -r
-#	export > ~/setAppEnv
-#}
+  # add default Homebrew directories (php@x.y) if brew is installed
+	if [[ -n $(command -v brew) ]]; then
+		all="$all  $(find "$(brew --cellar)" -maxdepth 1 -type d | grep -E 'php@[0-9\.]*$')"
+	fi
+  echo "$all"
+}
+
+function php_select {
+  local all
+  local input
+  input=$1
+  all=$(php_all)
+
+  #TODO are we restructuring the array here?
+  repos=()
+	for v in $(echo "$all" | tr " " "\n"); do
+		repos=("${repos[@]}" "$v")
+	done
+	all=
+
+  local selected
+	selected=$(php_select_exact "${repos[@]}")
+	if [[ -z $selected ]]; then
+		selected=$(php_select_fuzzy "${repos[@]}")
+	fi
+
+	# bail-out if we were unable to find a PHP matching given version
+	if [[ -z $selected ]]; then
+		echo "Sorry, unable to find version '$input'." >&2
+		return 0
+	fi
+
+
+	# export current paths
+	export PHPRC=""
+	[[ -f $selected/etc/php.ini ]] && export PHPRC=$selected/etc/php.ini
+	[[ -d $selected/bin  ]]        && export PATH="$selected/bin:$PATH"
+	[[ -d $selected/sbin ]]        && export PATH="$selected/sbin:$PATH"
+
+	# use configured manpath if it exists, otherwise, use `$selected/share/man`
+	local _manpath
+	_manpath=$(php-config --man-dir)
+	[[ -z $_manpath ]] && _manpath=$selected/share/man
+	[[ -d $_manpath ]] && export MANPATH="$_manpath:${MANPATH-}"
+
+  echo "$selected"
+
+	hash -r
+	export > ~/setAppEnv
+}
+
+function php_select_exact() {
+  local selected
+  local -a repos
+  selected=''
+  repos=$1
+
+  for r in "${repos[@]}"; do
+	  option="$r/$input"
+		if [[ -d "$option" ]]; then
+			selected="$option"
+			break;
+		fi
+	done
+
+	echo "$selected"
+}
+
+function php_select_fuzzy() {
+  local selected
+  local -a repos
+  local -a input_fuzzy
+  selected=''
+  repos=$1
+
+  # TODO what does this do
+  for r in "${repos[@]}"; do
+    while IFS= read -r -d '' _dir; do
+      input_fuzzy=("${input_fuzzy[@]}" "$("$_dir/bin/php-config" --version 2>/dev/null)")
+    done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
+  done
+
+  # Sort versioning
+  version=$(IFS=$'\n'; echo "${input_fuzzy[*]}" | sort -r -t . -k 1,1n -k 2,2n -k 3,3n | grep -E "^$input" 2>/dev/null | tail -1)
+
+  # Match exact version
+  for r in "${repos[@]}"; do
+    while IFS= read -r -d '' _dir; do
+      v="$("$_dir/bin/php-config" --version 2>/dev/null)"
+      if [[ -n "$version" && "$v" == "$version" ]]; then
+        selected=$_dir
+        break;
+      fi
+    done< <(find -H "$r" -maxdepth 1 -mindepth 1 -type d -print0)
+  done
+
+  echo "$selected"
+}
+### PHP ###
+
+function _ensure_rcfile {
+  file=pshrc
+  if [ ! -f $file ]; then
+    echo "Creating $file file..."
+    touch $file
+    $EDITOR $file
+    exit 0
+  fi
+}
 
 # MAIN
-if [ ! -f pshrc ]; then
-  echo "Creating pshrc file..."
-  touch pshrc
-  $EDITOR pshrc
-  exit 0
-fi
-source pshrc
-#
-#if [ -n "$php" ]
-#then
-#	php_switch "$php"
-#fi
+function _main {
+  _ensure_rcfile
+  source pshrc
 
-if [ -n "$composer" ]; then
-  composer_switch "$composer"
-fi
+  # PHP before composer
+  if [ -n "$php" ]; then
+    php_alias "$php"
+  fi
+  if [ -n "$composer" ]; then
+    composer_alias "$composer"
+  fi
 
-#if [ -n "$node" ]
-#then
-#	node_switch "$node"
-#	echo ''
-#fi
-bash --rcfile ~/setAppEnv
-rm -rf ~/setAppEnv
+  if [ -n "$node" ]
+  then
+  	node_alias "$node"
+  fi
+
+  bash --rcfile ~/setAppEnv
+  rm -rf ~/setAppEnv
+}
+_main
