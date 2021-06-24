@@ -65,7 +65,7 @@ function node_all_nvm {
 	all=$1
 
 	if [[ -n $NVM_DIR ]]; then
-		all="$all $(find "$NVM_DIR/all/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
+		all="$all $(find "$NVM_DIR/versions/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
 	fi
 
 	repos=()
