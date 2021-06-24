@@ -263,6 +263,7 @@ function _ensure_rcfile {
 # MAIN
 function _main {
 	_ensure_rcfile
+	# shellcheck disable=SC1091
 	source pshrc
 
 	# PHP before composer
