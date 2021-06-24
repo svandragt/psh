@@ -3,14 +3,16 @@
 Tired of switching tooling versions between PHP projects? Perhaps you've used a Python virtual environment before? This is an approximation of the same idea for PHP projects. It doesn't deal with installing packages though.
 
 Features:
- - Support for PHP, Composer, Node.
- - Fuzzy matching (sometimes).
- - Project dependencies are defined in a bash compatible file format.
+
+- Support for PHP , Composer, Node.
+- Fuzzy matching (sometimes).
+- Project dependencies are defined in a bash environment compatible file format.
 
 Supports
- - PHP installed via Homebrew
- - Composer
- - Node installed via NVM
+
+- PHP installed via Homebrew or PHPS (latter untested)
+- Composer
+- Node installed via NVM or Volta.
 
 
 ## Install
@@ -26,4 +28,4 @@ composer=1.10
 node=15.
 ```
 
-3. type `psh` to start a subshell with tooling set to those versions.
+3. type `psh` to start a subshell with tooling set to those versions. Type `exit` to exit the subshell.
