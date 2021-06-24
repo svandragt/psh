@@ -14,6 +14,8 @@ Supports
 - Composer
 - Node installed via NVM or Volta.
 
+Demo:
+[![asciicast](https://asciinema.org/a/64Bbwm4QJqW67Xrf9NWGpJtKX.svg)](https://asciinema.org/a/64Bbwm4QJqW67Xrf9NWGpJtKX)
 
 ## Install
 
