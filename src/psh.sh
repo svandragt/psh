@@ -34,6 +34,7 @@ function composer_select {
 }
 ### /COMPOSER ###
 
+
 ### NODE ###
 function node_alias {
     selected=$(node_select "$1")
@@ -74,6 +75,7 @@ function node_select {
     done <<< "$(node_all)"
 }
 ### /NODE ###
+
 
 ### PHP ###
 function php_alias {
@@ -127,8 +129,8 @@ function php_select {
         fi
     done <<< "$(php_all)"
 }
+### /PHP ###
 
-### PHP ###
 
 function _ensure_rcfile {
     file=pshrc
