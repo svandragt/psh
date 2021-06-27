@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+onti#!/usr/bin/env bash
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -132,7 +132,6 @@ function _ensure_rcfile {
     if [ ! -f $file ]; then
         echo "Creating $file file..."
         $EDITOR $file
-        exit 0
     fi
 }
 
