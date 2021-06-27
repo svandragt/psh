@@ -58,26 +58,25 @@ function node_alias {
 }
 
 function node_all_nvm {
-    all=$1
+    all=("$@")
 
     if [[ -n $NVM_DIR ]]; then
-        all="$all $(find "$NVM_DIR/versions/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')"
+        all+=("$(find "$NVM_DIR/versions/node" -maxdepth 1 -type d | grep -E 'v[0-9\.]*$')")
     fi
 
     repos=()
-    for v in $(echo "$all" | tr " " "\n"); do
+    for v in "${all[@]}"; do
         repos=("${repos[@]}" "$v")
     done
-    all=
 
     echo "${repos[@]}"
 }
 
 function node_all_volta {
-    all=$1
+    all=("$@")
 
     if [[ -n $(command -v volta) ]]; then
-        all="$all  $(find ~/.volta/tools/image/node -mindepth 1 -maxdepth 1 -type d)"
+        all+=("$(find ~/.volta/tools/image/node -mindepth 1 -maxdepth 1 -type d)")
     fi
 
     echo "${all[@]}"
@@ -92,7 +91,7 @@ function node_all {
     all=$(node_all_nvm "$all")
     all=$(node_all_volta "$all")
 
-    echo "$all"
+   echo "${all[@]}"
 }
 
 function node_select {
@@ -145,7 +144,7 @@ function php_all {
     if [[ -n $(command -v brew) ]]; then
         all="$all  $(find "$(brew --cellar)" -maxdepth 1 -type d | grep -E 'php@[0-9\.]*$')"
     fi
-    echo "$all"
+    echo "${all[@]}"
 }
 
 function php_select {
@@ -196,7 +195,7 @@ function php_select_exact {
     local -a repos
     local option
     selected=''
-    repos=$1
+    repos=("$@")
 
     for r in "${repos[@]}"; do
         option="$r/$input"
@@ -214,7 +213,7 @@ function php_select_fuzzy {
     local -a repos
     local -a input_fuzzy
     selected=''
-    repos=$1
+    repos=("$@")
 
     # TODO what does this do
     for r in "${repos[@]}"; do
