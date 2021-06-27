@@ -30,7 +30,7 @@ function composer_select {
             echo "$line"
             return 0
         fi
-    done <<< "$(composer_all)"
+    done <<< "$(composer_all | sort --reverse -V)"
 }
 ### /COMPOSER ###
 
@@ -72,7 +72,7 @@ function node_select {
             echo "$line/bin/node"
             return 0
         fi
-    done <<< "$(node_all)"
+    done <<< "$(node_all | sort --reverse -V)"
 }
 ### /NODE ###
 
@@ -127,7 +127,7 @@ function php_select {
             echo "$line"
             break
         fi
-    done <<< "$(php_all)"
+    done <<< "$(php_all | sort --reverse -V)"
 }
 ### /PHP ###
 
