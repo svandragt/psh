@@ -21,7 +21,7 @@ Demo:
 
 Note that you need to have the tooling pre-installed.
 
-1. Symlink `psh.sh` to `psh` in your path. eg `ln -s psh.sh ~/bin/psh`
+1. Symlink `src/psh.sh` to `psh` in your path. eg `cd src; ln -s $PWD/psh.src $HOME/bin/psh`
 2. Add a `pshrc` file to your project folder ala:
 
 ```
