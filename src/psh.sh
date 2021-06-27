@@ -1,6 +1,9 @@
-onti#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 IFS=$'\n\t'
+
+trap 'rm -f "$tempfile"' EXIT
+tempfile=$(mktemp) || exit 1
 
 ### COMPOSER ###
 function composer_alias {
@@ -14,7 +17,7 @@ function composer_alias {
     hash -r
     # shellcheck disable=SC2139
     alias composer="php $selected"
-    alias >>~/setAppEnv
+    alias >>"$tempfile"
 }
 
 function composer_all {
@@ -43,7 +46,7 @@ function node_alias {
     hash -r
     # shellcheck disable=SC2139
     alias node="$selected"
-    alias >>~/setAppEnv
+    alias >>"$tempfile"
 }
 
 function node_all {
@@ -94,7 +97,7 @@ function php_alias {
 
     # refresh shell
     hash -r
-    alias >>~/setAppEnv
+    alias >>"$tempfile"
 }
 
 function php_all {
@@ -154,7 +157,6 @@ function _main {
         node_alias "$node"
     fi
 
-    bash --rcfile ~/setAppEnv
-    rm -rf ~/setAppEnv
+    bash --rcfile "$tempfile"
 }
 _main
