@@ -2,66 +2,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+trap _cleanup INT EXIT RETURN
 trap 'rm -f "$tempfile"' EXIT
 tempfile=$(mktemp) || exit 1
 
-function _cleanup() {
-  unset -f _usage _cleanup
-  return 0
-}
-trap _cleanup INT EXIT RETURN
-
-###### some declarations for this example ######
 Options=$*
 larg_php=''
 larg_composer=''
 larg_node=''
-
-function _usage() {
-  ###### U S A G E : Help and ERROR ######
-  cat <<EOF
-   psh $Options
-   $*
-   Usage: psh <[options]>
-   Options:
-      -h   --help           Show this message
-      --composer=x.[y.z]    Set Composer version
-      --php=x.[y.z]         Set PHP version
-      --node=x.[y.z]        Set Node version
-EOF
-  return 1
-}
-
-##################################################################
-#######  "getopts" with: short options  AND  long options  #######
-#######            AND  short/long arguments               #######
-while getopts ':bfh-A:BF' OPTION; do
-  case "$OPTION" in
-  h) _usage ;;
-  -)
-    [ $OPTIND -ge 1 ] && optind=$(expr $OPTIND - 1) || optind=$OPTIND
-    eval OPTION="\$$optind"
-    OPTARG=$(echo "$OPTION" | cut -d'=' -f2)
-    OPTION=$(echo "$OPTION" | cut -d'=' -f1)
-    case $OPTION in
-    --help) _usage ;;
-    --php)
-      larg_php="$OPTARG"
-      ;;
-    --composer)
-      larg_composer="$OPTARG"
-      ;;
-    --node)
-      larg_node="$OPTARG"
-      ;;
-    *) _usage " Long: >>>>>>>> invalid options (long) " ;;
-    esac
-    OPTIND=1
-    shift
-    ;;
-  ?) _usage "Short: >>>>>>>> invalid options (short) " ;;
-  esac
-done
 
 ### COMPOSER ###
 function composer_alias() {
@@ -187,6 +135,26 @@ function php_select() {
 }
 ### /PHP ###
 
+function _cleanup() {
+  unset -f _usage _cleanup
+  return 0
+}
+
+function _usage() {
+  ###### U S A G E : Help and ERROR ######
+  cat <<EOF
+   psh $Options
+   $*
+   Usage: psh <[options]>
+   Options:
+      -h   --help           Show this message
+      --composer=x.[y.z]    Set Composer version
+      --php=x.[y.z]         Set PHP version
+      --node=x.[y.z]        Set Node version
+EOF
+  return 1
+}
+
 function _ensure_rcfile() {
   file=pshrc
   if [ ! -f $file ]; then
@@ -196,33 +164,58 @@ function _ensure_rcfile() {
 }
 
 # MAIN
-function _main() {
-  _ensure_rcfile
-  # shellcheck disable=SC1091
-  source pshrc
+while getopts ':bfh-A:BF' OPTION; do
+  case "$OPTION" in
+  h) _usage ;;
+  -)
+    [ $OPTIND -ge 1 ] && optind=$(expr $OPTIND - 1) || optind=$OPTIND
+    eval OPTION="\$$optind"
+    OPTARG=$(echo "$OPTION" | cut -d'=' -f2)
+    OPTION=$(echo "$OPTION" | cut -d'=' -f1)
+    case $OPTION in
+    --help) _usage ;;
+    --php)
+      larg_php="$OPTARG"
+      ;;
+    --composer)
+      larg_composer="$OPTARG"
+      ;;
+    --node)
+      larg_node="$OPTARG"
+      ;;
+    *) _usage " Long: >>>>>>>> invalid options (long) " ;;
+    esac
+    OPTIND=1
+    shift
+    ;;
+  ?) _usage "Short: >>>>>>>> invalid options (short) " ;;
+  esac
+done
 
-  # PHP before composer
-  if [ -n "${larg_php}" ]; then
-    php=$larg_php
-  fi
-  if [ -n "${php-}" ]; then
-    php_alias "$php"
-  fi
+_ensure_rcfile
+# shellcheck disable=SC1091
+source pshrc
 
-  if [ -n "${larg_composer}" ]; then
-    composer=$larg_composer
-  fi
-  if [ -n "${composer-}" ]; then
-    composer_alias "$composer"
-  fi
+# PHP before composer
+if [ -n "${larg_php}" ]; then
+  php=$larg_php
+fi
+if [ -n "${php-}" ]; then
+  php_alias "$php"
+fi
 
-  if [ -n "${larg_node}" ]; then
-    node=$larg_node
-  fi
-  if [ -n "${node-}" ]; then
-    node_alias "$node"
-  fi
+if [ -n "${larg_composer}" ]; then
+  composer=$larg_composer
+fi
+if [ -n "${composer-}" ]; then
+  composer_alias "$composer"
+fi
 
-  bash --rcfile "$tempfile"
-}
-_main
+if [ -n "${larg_node}" ]; then
+  node=$larg_node
+fi
+if [ -n "${node-}" ]; then
+  node_alias "$node"
+fi
+
+bash --rcfile "$tempfile"
