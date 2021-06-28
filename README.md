@@ -17,7 +17,7 @@ Supports
 Demo:
 [![asciicast](https://asciinema.org/a/64Bbwm4QJqW67Xrf9NWGpJtKX.svg)](https://asciinema.org/a/64Bbwm4QJqW67Xrf9NWGpJtKX)
 
-## Install
+## Install and Setup
 
 Note that you need to have the tooling pre-installed.
 
@@ -32,9 +32,11 @@ node=15.
 
 3. type `psh` to start a subshell with tooling set to those versions. Type `exit` to exit the subshell.
 
+
 ## Tip
 
 If you're using zsh you can use the following function to automatically enter the subshell:
+
 ```
 function chpwd() {
     if [ -r $PWD/pshrc ]; then
@@ -42,4 +44,19 @@ function chpwd() {
         return
     fi
 }
+```
+
+You can override tooling versions by passing options to `psh`. They take priority over matching `pshrc` versions:
+
+```
+$  psh --help
+
+   Usage: psh <[options]>
+   Options:
+      -h   --help           Show this message
+      --composer=x.[y.z]    Set Composer version
+      --php=x.[y.z]         Set PHP version
+      --node=x.[y.z]        Set Node version
+
+example: psh --php=7.3.
 ```
