@@ -29,6 +29,7 @@ function _usage() {
       --php=x.[y.z]         Set PHP version
       --node=x.[y.z]        Set Node version
 EOF
+  return 1
 }
 
 ##################################################################
