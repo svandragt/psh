@@ -23,7 +23,6 @@ function composer_alias() {
   hash -r
   # shellcheck disable=SC2139
   alias composer="php $selected"
-  alias >>"$tempfile"
 }
 
 function composer_all() {
@@ -52,7 +51,6 @@ function node_alias() {
   hash -r
   # shellcheck disable=SC2139
   alias node="$selected"
-  alias >>"$tempfile"
 }
 
 function node_all() {
@@ -103,7 +101,6 @@ function php_alias() {
 
   # refresh shell
   hash -r
-  alias >>"$tempfile"
 }
 
 function php_all() {
@@ -196,6 +193,9 @@ _ensure_rcfile
 # shellcheck disable=SC1091
 source pshrc
 
+#Bash Prompt
+export PS1='${PWD#"${PWD%/*/*}/"} git:($(git rev-parse --abbrev-ref HEAD)) \$ '
+
 # PHP before composer
 if [ -n "${larg_php}" ]; then
   php=$larg_php
@@ -218,4 +218,5 @@ if [ -n "${node-}" ]; then
   node_alias "$node"
 fi
 
+alias >>"$tempfile"
 bash --rcfile "$tempfile"
