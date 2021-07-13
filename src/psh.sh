@@ -196,6 +196,9 @@ _ensure_rcfile
 # shellcheck disable=SC1091
 source pshrc
 
+#Bash Prompt
+export PS1='${PWD#"${PWD%/*/*}/"} git:($(git rev-parse --abbrev-ref HEAD)) \$ '
+
 # PHP before composer
 if [ -n "${larg_php}" ]; then
   php=$larg_php
